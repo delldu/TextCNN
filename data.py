@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # coding=utf-8
 
 # /************************************************************************************
@@ -9,24 +8,24 @@
 
 import pickle
 
-from torchtext import data
+import torchtext
 
 
 def text_token(x):
     return [w for w in x.split(" ") if len(w) > 0]
 
 
-FastTextTEXT = data.Field(sequential=True, tokenize=text_token, lower=True)
+FastTextTEXT = torchtext.data.Field(sequential=True, tokenize=text_token, lower=True)
 
 
 def label_token(x):
     return [x.replace("__label__", "")]
 
 
-FastTextLABEL = data.Field(sequential=False, tokenize=label_token, lower=True)
+FastTextLABEL = torchtext.data.Field(sequential=False, tokenize=label_token, lower=True)
 
 
-class FastTextDataset(data.Dataset):
+class FastTextDataset(torchtext.data.Dataset):
     @staticmethod
     def sort_key(ex):
         return len(ex.text)
@@ -50,7 +49,7 @@ class FastTextDataset(data.Dataset):
 
                 text, label = s[0], s[1]
                 label = label.replace("__label__", "")
-                e = data.Example()
+                e = torchtext.data.Example()
                 setattr(e, "text", text_field.preprocess(text))
                 setattr(e, "label", label_field.preprocess(label))
                 examples.append(e)
@@ -66,7 +65,7 @@ def fasttext_dataloader(datafile, batchsize, shuffle=False):
     text_field.build_vocab(dataset)
     label_field.build_vocab(dataset)
 
-    dataiter = data.Iterator(dataset, batchsize, shuffle, repeat=False)
+    dataiter = torchtext.data.Iterator(dataset, batchsize, shuffle, repeat=False)
     # dataiter.init_epoch()
 
     return dataiter, text_field, label_field

@@ -21,8 +21,8 @@ parser = argparse.ArgumentParser(description='Text CNN classificer Predictor')
 parser.add_argument(
     '-model',
     type=str,
-    default="logs/model.pth",
-    help='file name of the pre-trained model')
+    default="model/textcnn.model",
+    help='file name of the pre-trained model[model/textcnn.model]')
 parser.add_argument(
     'predict', type=str, default=None, help='predict the sentence')
 
@@ -33,8 +33,8 @@ if __name__ == '__main__':
     text_field = data.FastTextTEXT
     label_field = data.FastTextLABEL
 
-    text_field.vocab = data.load_vocab("logs/text.vocab")
-    label_field.vocab = data.load_vocab("logs/label.vocab")
+    text_field.vocab = data.load_vocab("model/text.vocab")
+    label_field.vocab = data.load_vocab("model/label.vocab")
 
     # model
     if os.path.exists(args.model):
@@ -45,6 +45,5 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     if args.predict is not None:
-        label = model.predict(args.predict, cnn, text_field, label_field,
-                              conf.cuda)
+        label = model.predict(args.predict, cnn, text_field, label_field, conf.cuda)
         print('\n[Text]  {}\n[Label] {}\n'.format(args.predict, label))

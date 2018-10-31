@@ -19,8 +19,8 @@ parser = argparse.ArgumentParser(description='Evaluate Text CNN classificer')
 parser.add_argument(
     '-model',
     type=str,
-    default="logs/model.pth",
-    help='filename of pre-trained model [logs/model.pth]')
+    default="model/textcnn.model",
+    help='filename of pre-trained model [model/textcnn.model]')
 
 if __name__ == '__main__':
     conf = Config()
@@ -38,8 +38,8 @@ if __name__ == '__main__':
         print("Model doesn't exist.")
         sys.exit(-1)
 
-    text_field.vocab = data.load_vocab("logs/text.vocab")
-    label_field.vocab = data.load_vocab("logs/label.vocab")
+    text_field.vocab = data.load_vocab("model/text.vocab")
+    label_field.vocab = data.load_vocab("model/label.vocab")
 
     print(cnn)
 

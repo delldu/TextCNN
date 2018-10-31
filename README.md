@@ -3,7 +3,7 @@
 
 | **A picture is worth a thousand words ！** |
 | :----------------------------------------- |
-| ![](textcnn.jpg)                           |
+| ![](images/textcnn.jpg)                           |
 
 ## Dataset
 
@@ -33,9 +33,9 @@ Your text must be **separated by space** and **longer than the max kernel size (
 
 ## Requirement
 
-* python 3.6
-* pytorch 0.4.0
-* torchtext 0.3.0 
+* python 3.6.2
+* pytorch 1.0.0
+* torchtext 0.4.0 
 
 * https://arxiv.org/abs/1408.5882)
 

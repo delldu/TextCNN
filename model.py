@@ -11,7 +11,6 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-# from torch.autograd import Variable
 
 
 class TextCNN(nn.Module):
@@ -64,25 +63,23 @@ class TextCNN(nn.Module):
         return logit
 
 
-def save_steps(epochs):
-    n = int((epochs + 1) / 10)
-    if n < 10:
-        n = 10
-    n = 10 * int((n + 9) / 10)  # round to 10x times
-    return n
-
-
-def save_model(model, steps):
-    if not os.path.isdir("logs"):
-        os.makedirs("logs")
-    save_path = 'logs/model.pth-{}'.format(steps)
-    torch.save(model, save_path)
-
-
 def train(train_iter, model, args):
     """
     Train Text CNN Model
     """
+    def save_model(model, steps):
+        if not os.path.isdir("logs"):
+            os.makedirs("logs")
+        save_path = 'logs/textcnn.model-{}'.format(steps)
+        torch.save(model, save_path)
+
+    def save_steps(epochs):
+        n = int((epochs + 1) / 10)
+        if n < 10:
+            n = 10
+        n = 10 * int((n + 9) / 10)  # round to 10x times
+        return n
+
     print("Start training ...")
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
@@ -94,6 +91,10 @@ def train(train_iter, model, args):
     save_interval = save_steps(args.epochs)
 
     for epoch in range(1, args.epochs+1):
+        training_loss = 0.0
+        training_acc = 0.0
+        training_count = 0.0
+
         for batch in train_iter:
             feature, target = batch.text, batch.label
             feature.data.t_(), target.data.sub_(1)  # batch first, index align
@@ -113,11 +114,17 @@ def train(train_iter, model, args):
             loss.backward()
             optimizer.step()
 
-            corrects = (torch.max(logit,
-                                  1)[1].view(target.size()).data == target.data).sum()
-            accuracy = 100.0 * corrects / batch.batch_size
-            print('Training epoch [{}/{}] - loss: {:.6f}  acc: {:.4f}%'.format(
-                epoch, args.epochs, loss.data[0], accuracy))
+            corrects = (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
+
+            training_loss += loss.item()
+            training_acc += corrects.item()
+            training_count += batch.batch_size
+
+        training_loss /= training_count
+        training_acc /= training_count
+        accuracy = 100.0 * training_acc
+        print('Training epoch [{}/{}] - loss: {:.6f}  acc: {:.2f}%'.format(
+            epoch, args.epochs, training_loss, accuracy))
 
         if epoch % save_interval == 0:
             save_model(model, epoch)
